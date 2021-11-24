@@ -1,0 +1,99 @@
+design_name = 'LMModel1'
+aedtProject = 'C:\Users\TF\Documents\models\dataset\12s11PM_mover_coil.aedt'
+model_opt_dir = 'C:\Users\TF\Documents\models\dataset'
+setup = "Setup1"
+parametric_setup = ""
+
+###############################################################################
+# 仿真软件设置
+# simulation configuration
+###############################################################################
+[Simulation]
+ansysedt_path = "C:/Program Files/AnsysEM/AnsysEM21.1/Win64/ansysedt.exe"
+Timeout_in_minutes = 60
+keepResultFolder = 'True'
+
+###############################################################################
+# 遗传算法设置
+# genetic algorithm configuration
+# 目前只支持NSGA2，其他之后开发。
+###############################################################################
+[GAConfig]
+Algorithm = 'NSGA2'
+Population = 20
+MaxEvaluations = 20
+CPU_cores = 8
+
+###############################################################################
+# 定义变量
+# define variables
+###############################################################################
+[[Variables]]
+title = 'poles'
+min = 1
+max = 11
+step = 1
+unit = ''
+encoding = 'StepReal'
+[[Variables]]
+title = 'long'
+min = 4
+max = 10
+step = 1
+unit = 'mm'
+encoding = 'StepReal'
+[[Variables]]
+title = 'slothigh'
+min = 15
+max = 45
+step = 1
+unit = 'mm'
+encoding = 'StepReal'
+[[Variables]]
+title = 't_theta'
+min = 0
+max = 10
+step = 1
+unit = 's'
+encoding = 'StepReal'
+[[Variables]]
+title = 'tw'
+min = 5
+max = 9.5
+step = 0.5
+unit = 'mm'
+encoding = 'StepReal'
+[[Variables]]
+title = 'high2'
+min = 58
+max = 65
+step = 1
+unit = 'mm'
+encoding = 'StepReal'
+[[Variables]]
+title = 'airgap'
+min = 2
+max = 4
+step = 1
+unit = 'mm'
+encoding = 'StepReal'
+
+###############################################################################
+# 定义目标函数
+# define objectives
+###############################################################################
+# 第一个目标函数： force
+# Useless
+[[Objectives]]
+title = 'force'
+direction = "Maximize"
+constraint = "None"
+value = "0"
+postprocessing = "Average"
+
+
+###############################################################################
+# 定义目标函数 未完工，但是要保留
+# define Constraints
+###############################################################################
+[[Constraints]]

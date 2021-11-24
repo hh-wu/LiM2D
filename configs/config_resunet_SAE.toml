@@ -1,0 +1,93 @@
+[project]
+project_path = 'C:\Users\TF\Documents\models\12s11PM_mover_coil.aedt'
+active_design_name = 'LMModel1'
+dataset_dir = 'C:\Users\TF\Documents\test\test_dataset'
+out_suffix = '.fld'
+bxy_filename = 'bxy'
+current_density_filename = 'current_density'
+material_filename = 'material'
+model_depth = 0.1
+
+[Simulation]
+ansysedt_path = 'C:/Program Files/AnsysEM/AnsysEM21.1/Win64/ansysedt.exe'
+Timeout_in_minutes = 60
+keepResultFolder = 'True'
+
+[export] # 将输出调整到接近x=512, y=256，现在是489,243
+export_path = 'LM_models'
+xmin = -10.0
+xmax = 478.0
+xstep = 1.0
+ymin = -10.5
+ymax = 110.5  # 原来边界是75.5mm,为了凑数调整到110
+ystep = 0.5
+unit = 'mm'
+time_min = 0
+time_max = 234
+time_step = 1
+time_uint = 's'
+
+properties = ['B', 'J', 'Temp']
+n_airgap = '((pmh+airgap)+prh1+0.5)/ystep+1'
+script_start = '''
+
+'''
+scripts = '''
+# -*- coding: UTF-8 -*-
+import ScriptEnv
+ScriptEnv.Initialize("Ansoft.ElectronicsDesktop")
+
+oDesktop.OpenProject("{project_path}")
+oProject = oDesktop.SetActiveProject("{project_name}")
+oDesign = oProject.SetActiveDesign("{design_name}")
+oModule = oDesign.GetModule("FieldsReporter")
+
+oModule.CalcStack("clear")
+oModule.EnterQty("B")
+oModule.EnterVol("export_region")
+oModule.CalcOp("Domain")
+oModule.ExportOnGrid("{bxy_filename}", ["{xmin}{unit}", "{ymin}{unit}", "0mm"], ["{xmax}{unit}", "{ymax}{unit}", "0mm"], ["{xstep}{unit}", "{ystep}{unit}", "0mm"], "Setup1 : Transient",
+	[
+		"Time:="		, "{time}{time_unit}",
+	], True, "Cartesian", ["0mm", "0mm", "0mm"], False)
+oModule.CalcStack("clear")
+oModule.EnterQty("J")
+oModule.EnterVol("export_region")
+oModule.CalcOp("Domain")
+oModule.ExportOnGrid("{current_density_filename}", ["{xmin}{unit}", "{ymin}{unit}", "0mm"], ["{xmax}{unit}", "{ymax}{unit}", "0mm"], ["{xstep}{unit}", "{ystep}{unit}", "0mm"], "Setup1 : Transient",
+	[
+		"Time:="		, "{time}{time_unit}",
+	], True, "Cartesian", ["0mm", "0mm", "0mm"], False)
+oModule.CalcStack("clear")
+oModule.EnterQty("Temp")
+oModule.EnterVol("export_region")
+oModule.CalcOp("Domain")
+oModule.ExportOnGrid("{material_filename}", ["{xmin}{unit}", "{ymin}{unit}", "0mm"], ["{xmax}{unit}", "{ymax}{unit}", "0mm"], ["{xstep}{unit}", "{ystep}{unit}", "0mm"], "Setup1 : Transient",
+	[
+		"Time:="		, "{time}{time_unit}",
+	], True, "Cartesian", ["0mm", "0mm", "0mm"], False)
+'''
+
+[datset]
+save_path = 'dataset.npy'
+
+[Initialization]
+raw_dataset_path = 'C:\Users\TF\Documents\models\dataset'
+preprocessed_dataset_path = 'C:\Users\TF\Documents\models\processed'
+BUFFER_SIZE = 400
+BATCH_SIZE = 3
+IMG_WIDTH = 489
+IMG_HEIGHT = 243
+
+opt_width = 512
+opt_height = 256
+epoches = 100
+output_channels = 2
+input_channels = 4
+
+[Generator]
+gen = 'resunet'
+loss = 'tf.reduce_sum'
+
+[Discriminator]
+disc = 'original'
